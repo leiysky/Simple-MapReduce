@@ -23,6 +23,7 @@ channel.queue_declare(queue='map')
 channel.queue_declare(queue='result')
 
 def publish():
+    print('Publishing a set of message')
     for i in x:
         i = list(map(str, i))
         i = ','.join(i)
@@ -33,7 +34,7 @@ def run_iterate(ch, method, properties, body):
     global count
     count+=1
     if (count > 10):
-        return
+        exit(0)
     print('Iterate for %d times'%count)
     for i in range(3):
         idlist = store.get_by_key('type'+str(i))

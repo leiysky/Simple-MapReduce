@@ -1,12 +1,16 @@
 import numpy as np
 import pika
 import store as st
+import os
 
+env_dict = os.environ
 worker_name = 'Mapper1'
+# host = env_dict['HOST']
+host = 'rabbit'
 
 # initialize RabbitMQ
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='localhost'))
+    pika.ConnectionParameters(host=host))
 channel = connection.channel()
 channel.queue_declare('map')
 channel.queue_declare('reduce')

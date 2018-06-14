@@ -3,10 +3,12 @@
 
 import redis
 import logging
+import os
 
 logger = logging.getLogger()
+redis_host = os.environ['REDIS_HOST']
 
-pool = redis.ConnectionPool(host='localhost', port=6379, decode_responses=True)
+pool = redis.ConnectionPool(host=redis_host, port=6379, decode_responses=True)
 r = redis.Redis(connection_pool=pool)
 if(r.get('myid') == None):
     r.set('myid', 0)

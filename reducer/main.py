@@ -2,10 +2,17 @@
 #coding: utf-8
 import store
 import pika
+import logging
+import os
 
+# initialize logger
+logger = logging.getLogger('mapreduce')
+logger.addHandler(logging.FileHandler('/var/log/result', 'a'))
+logger.setLevel(logging.INFO)
 # initialize RabbitMQ
+mq_host = os.environ['MQ_HOST']
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='localhost'))
+    pika.ConnectionParameters(host=mq_host))
 channel = connection.channel()
 channel.queue_declare(queue='reduce')
 channel.queue_declare(queue='result')
@@ -30,13 +37,18 @@ def run_reducing(ch, method, properties, body):
     mod = int(store.r.get('maxnum'))
     if ((count+1)%mod==0):
         count = 0
+        logger.info('Classify result is:')
+        logger.info('C0: ' + str(store.get_c(0)))
+        logger.info('C1: ' + str(store.get_c(1)))
+        logger.info('C2: ' + str(store.get_c(2)))
+        logger.info('type0: %d' % result['0'].__len__())
+        logger.info('type1: %d' % result['1'].__len__())
+        logger.info('type2: %d' % result['2'].__len__())
         result = {}
         for i in range(3):
             result[str(i)] = []
         channel.publish(exchange='', routing_key='result', body='complete')
-    print('0: %d' % result['0'].__len__())
-    print('1: %d' % result['1'].__len__())
-    print('2: %d' % result['2'].__len__())
+    
 
 
 def append_by_type(type, value):
